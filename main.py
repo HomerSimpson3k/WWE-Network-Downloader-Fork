@@ -3,7 +3,7 @@
 import wwe
 import m3u8, os,re
 import argparse
-import download_util, CONSTANTS, db_util
+import download_util, CONSTANTS, CREDENTIALS, db_util
 import time
 import threading
 from shutil import which
@@ -68,6 +68,7 @@ if args['end_time']:
     END_TIME = wwe.time_to_seconds(args['end_time'])
     
 # Set whether it is a partial download or not
+partial_download = False
 try:
     if START_FROM:
         partial_download = True
@@ -95,7 +96,7 @@ if CONSTANTS.USERNAME == "" or CONSTANTS.PASSWORD == "":
     print("Please enter your username and/or password in CONSTANTS.py.")
     exit()
 
-account = wwe.wwe_network(CONSTANTS.USERNAME,CONSTANTS.PASSWORD)
+account = wwe.wwe_network(CREDENTIALS.USERNAME,CREDENTIALS.PASSWORD)
 account.login()
 
 # Get the video JSON which tells us the hls url link
@@ -161,6 +162,8 @@ kwargs = {"playlist":audio_playlist,
 try:
     if START_FROM:
         kwargs.update({"start_from":START_FROM})
+    else:
+        kwargs.update({"start_from":0})
 except NameError:
     START_FROM = 0
     kwargs.update({"start_from":0})
