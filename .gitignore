@@ -11,4 +11,3 @@ compiler/*
 *.mkv
 *.pyc
 events.db
-CREDENTIALS.py

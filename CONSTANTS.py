@@ -1,7 +1,12 @@
 #!/usr/bin/python3
 
-# TO GET THE EPISODE JSON INFORMATION
+import pathlib
 
+# USERNAME AND PASSWORD
+USERNAME = ""
+PASSWORD = ""
+
+# TO GET THE EPISODE JSON INFORMATION
 HEADERS = {
     'x-api-key': '857a1e5d-e35e-4fdf-805b-a87b6f8364bf',
     'Realm': 'dce.wwe',
@@ -10,9 +15,12 @@ HEADERS = {
 
 # FOR THE DOWNLOADER
 DOWNLOAD_HEADERS = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/117.0'}
-OUTPUT_FOLDER = "output"
-TEMP_FOLDER = "temp"
+BASE_DIR = pathlib.Path(__file__).parent.resolve()
+OUTPUT_FOLDER = f"{BASE_DIR}/output"
+TEMP_FOLDER = f"{BASE_DIR}/temp"
 
+# DATABASE
+DB_FILE = f"{BASE_DIR}/events.db"
 
 # VIDEO SIZE INFORMATION
 VIDEO_QUALITY = [8000, # 1080p high

@@ -2,7 +2,7 @@
 
 import urllib3, certifi
 import m3u8, json
-import sys, subprocess, os
+import sys, subprocess, os, shutil, re
 import CONSTANTS
 
 class download:
@@ -14,10 +14,10 @@ class download:
 
     def create_dirs(self):
         # If the download directory doesn't exist, we need to create it
-        if not os.path.isdir(f"./{CONSTANTS.OUTPUT_FOLDER}"):
-            os.mkdir(f"./{CONSTANTS.OUTPUT_FOLDER}")
-        if not os.path.isdir(f"./{CONSTANTS.TEMP_FOLDER}"):
-            os.mkdir(f"./{CONSTANTS.TEMP_FOLDER}")
+        if not os.path.isdir(f"{CONSTANTS.OUTPUT_FOLDER}"):
+            os.mkdir(f"{CONSTANTS.OUTPUT_FOLDER}")
+        if not os.path.isdir(f"{CONSTANTS.TEMP_FOLDER}"):
+            os.mkdir(f"{CONSTANTS.TEMP_FOLDER}")
 
     def get_index_m3u8(self, link):
         # Return the contents of the m3u8 playlist
@@ -44,6 +44,9 @@ class download:
         json_file = open(filename, "r")
         part = json.load(json_file)
         return float(part.get("current_time"))
+    
+    def replace_and_capitalize(self, input_string):
+        return re.sub(r'\s+', '.', input_string).title()
 
     def combine_videos(self, title, file_folder, keep_files=False, has_subtitles=False):
         input_file = CONSTANTS.TEMP_FOLDER + "/" + title
@@ -70,15 +73,20 @@ class download:
                 "{output_file}.mp4" -y')
 
         subprocess.call(ffmpeg_command, shell=True)
+
+        # Move file + delete output folder
+        os.replace(f"{output_file}.mp4", f"{os.getcwd()}/{self.replace_and_capitalize(title)}.mp4")
+        shutil.rmtree(f"{CONSTANTS.OUTPUT_FOLDER}/{file_folder}")
+
         if not keep_files:
-            os.remove(f"{os.getcwd()}/{CONSTANTS.TEMP_FOLDER}/{title}.aac")
-            os.remove(f"{os.getcwd()}/{CONSTANTS.TEMP_FOLDER}/{title}.aac.part")
-            os.remove(f"{os.getcwd()}/{CONSTANTS.TEMP_FOLDER}/{title}.ts")
-            os.remove(f"{os.getcwd()}/{CONSTANTS.TEMP_FOLDER}/{title}.ts.part")
-            os.remove(f"{os.getcwd()}/{CONSTANTS.TEMP_FOLDER}/{title}-metafile")
+            os.remove(f"{CONSTANTS.TEMP_FOLDER}/{title}.aac")
+            os.remove(f"{CONSTANTS.TEMP_FOLDER}/{title}.aac.part")
+            os.remove(f"{CONSTANTS.TEMP_FOLDER}/{title}.ts")
+            os.remove(f"{CONSTANTS.TEMP_FOLDER}/{title}.ts.part")
+            os.remove(f"{CONSTANTS.TEMP_FOLDER}/{title}-metafile")
             # Try to remove the subtitles file, we will error if it isn't found
             try:
-                os.remove(f"{os.getcwd()}/{CONSTANTS.TEMP_FOLDER}/{title}.vtt")
+                os.remove(f"{CONSTANTS.TEMP_FOLDER}/{title}.vtt")
             except FileNotFoundError:
                 pass
 
@@ -89,7 +97,7 @@ class download:
         # when we get the total length
         files_to_download = 0
         # set the title to our title and output file
-        title = os.getcwd() + "/" + CONSTANTS.TEMP_FOLDER + "/" + title
+        title = CONSTANTS.TEMP_FOLDER + "/" + title
 
         # Get the format of the file we are downloading.
         # Result should either be aac or ts

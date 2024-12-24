@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 import sqlite3
-import os
+import CONSTANTS
 
 class database:
 
     # Initialise the database
     def __init__(self):
-        self.conn = sqlite3.connect("events.db")
+        self.conn = sqlite3.connect(CONSTANTS.DB_FILE)
         self.c = self.conn.cursor()
 
 

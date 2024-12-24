@@ -1,9 +1,13 @@
+# TODO
+# - save temp files and sqlite in project folder
+# - only save resulting mp4 in folder where executed
+
 #!/usr/bin/python3
 
 import wwe
 import m3u8, os,re
 import argparse
-import download_util, CONSTANTS, CREDENTIALS, db_util
+import download_util, CONSTANTS, db_util
 import time
 import threading
 from shutil import which
@@ -27,6 +31,7 @@ parser.add_argument('-st','--start_time', help='How far into the video you want 
 parser.add_argument('-et','--end_time', help='How far into the video you want to stop, in seconds.', required=False)
 parser.add_argument('-of','--output_filename', help='Custom output file name.', required=False)
 parser.add_argument('-f','--force', help='Overwrite previously downloaded files.', required=False, action='store_true')
+parser.add_argument('-l','--language', help='Language of the video. Defaults to eng(lish).', required=False)
 
 args = vars(parser.parse_args())
 
@@ -91,12 +96,16 @@ if args['quality']:
 if args['force']:
     force_download = True
 
+LANGUAGE = "eng"
+if args['language']:
+    LANGUAGE = args['language']
+
 # Login
 if CONSTANTS.USERNAME == "" or CONSTANTS.PASSWORD == "":
     print("Please enter your username and/or password in CONSTANTS.py.")
     exit()
 
-account = wwe.wwe_network(CREDENTIALS.USERNAME,CREDENTIALS.PASSWORD)
+account = wwe.wwe_network(CONSTANTS.USERNAME,CONSTANTS.PASSWORD)
 account.login()
 
 # Get the video JSON which tells us the hls url link
@@ -143,9 +152,15 @@ index_m3u8_obj = m3u8.loads(index_m3u8.data.decode('utf-8'))
 # Get our audio playlist
 audio_qualities = []
 for i in index_m3u8_obj.media:
-    # We want English audio, so any files with eng as its language is added to our list
-    if "eng" in i.language:
+    if LANGUAGE in i.language:
         audio_qualities.append((int(i.group_id.split('audio-')[1]), base_url[0]+"/"+ i.uri))
+
+# Fallback if selected language is not found
+if len(audio_qualities) == 0:
+    for i in index_m3u8_obj.media:
+        # We want English audio, so any files with eng as its language is added to our list
+        if "eng" in i.language:
+            audio_qualities.append((int(i.group_id.split('audio-')[1]), base_url[0]+"/"+ i.uri))
 
 # Sort the audio quality from high to low
 audio_qualities.sort(reverse=True)
