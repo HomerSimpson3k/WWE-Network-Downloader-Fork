@@ -232,7 +232,9 @@ for thread in download_threads:
     thread.join()
 
 # Download the chapter information
-account.write_metadata(stream_url[2], clean_text(title), args['chapter'], START_FROM, END_TIME)
+# Ignore if chapter information are not available
+if stream_url[2] is not None:
+    account.write_metadata(stream_url[2], clean_text(title), args['chapter'], START_FROM, END_TIME)
 
 # Create output folder if it doesn't exist
 if not os.path.exists(CONSTANTS.OUTPUT_FOLDER + "/" + clean_text(video_link[0])):

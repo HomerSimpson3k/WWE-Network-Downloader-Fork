@@ -100,7 +100,7 @@ python3 main.py -c -q 3 -s -e -t https://watch.wwe.com/episode/Bret-Hart-132278
 
 > **-t/--title** - Link to the video you want to download.\
 > **-q/--quality** - Quality of the video you want to download. 1 is 1080p high (default) 6 being 288p (lowest).\
-> **-c/--chapter** - Add milestone chapters to the video.\
+> **-c/--chapter** - Add milestone chapters to the video. Not available for all videos.\
 > **-s/--subtitles** - Downloads the subtitles.\
 > **-k/--keep_files** - Keep temporary aac and ts files.\
 > <strike>**-e** - Write a Kodi episode NFO file.</strike> *\
