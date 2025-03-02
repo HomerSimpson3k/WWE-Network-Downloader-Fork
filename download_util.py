@@ -52,6 +52,10 @@ class download:
         input_file = CONSTANTS.TEMP_FOLDER + "/" + title
         output_file = CONSTANTS.OUTPUT_FOLDER + "/" + file_folder + "/" + title
         metafile = CONSTANTS.TEMP_FOLDER + "/" + title + "-metafile"
+
+        meta_param = ''
+        if os.path.isfile(metafile):
+            meta_param = f'-i "{metafile}" -map_metadata 1'
         
         # If we have downloaded subtitles, add them to the command
         if has_subtitles:
@@ -60,7 +64,7 @@ class download:
                 -i "{subtitles}"\
                 -i "{input_file}.ts"\
                 -i "{input_file}.aac"\
-                -i "{metafile}" -map_metadata 1\
+                {meta_param}\
                 -c copy\
                 -c:s mov_text\
                 "{output_file}.mp4" -y')
@@ -68,7 +72,7 @@ class download:
             ffmpeg_command = (f'ffmpeg \
                 -i "{input_file}.ts"\
                 -i "{input_file}.aac"\
-                -i "{metafile}" -map_metadata 1\
+                {meta_param}\
                 -c copy\
                 "{output_file}.mp4" -y')
 
@@ -83,7 +87,8 @@ class download:
             os.remove(f"{CONSTANTS.TEMP_FOLDER}/{title}.aac.part")
             os.remove(f"{CONSTANTS.TEMP_FOLDER}/{title}.ts")
             os.remove(f"{CONSTANTS.TEMP_FOLDER}/{title}.ts.part")
-            os.remove(f"{CONSTANTS.TEMP_FOLDER}/{title}-metafile")
+            if os.path.isfile(metafile):
+                os.remove(f"{CONSTANTS.TEMP_FOLDER}/{title}-metafile")
             # Try to remove the subtitles file, we will error if it isn't found
             try:
                 os.remove(f"{CONSTANTS.TEMP_FOLDER}/{title}.vtt")
